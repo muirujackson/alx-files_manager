@@ -10,8 +10,9 @@ class RedisClient {
    */
   constructor() {
     this.client = createClient();
-    this.isClientConnected = false;
+    this.isClientConnected = true;
     this.client.on('error', (err) => {
+      this.isClientConnected = false;
       console.error('Redis client failed to connect:', err.message || err.toString());
     });
     this.client.on('connect', () => {
@@ -44,7 +45,7 @@ class RedisClient {
    * @returns {Promise<void>}
    */
   async set(key, value, duration) {
-
+    await promisify(this.client.SETEX)
       .bind(this.client)(key, duration, value);
   }
 
